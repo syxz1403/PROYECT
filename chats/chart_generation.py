@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import csv
-from modules.directory_operations import Directorio
 
 def generar_grafica(entidad):
     try:
