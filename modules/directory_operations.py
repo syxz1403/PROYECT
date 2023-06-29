@@ -1,41 +1,52 @@
 import os
+import shutil
+from modules.file_operations import Archivo
 
-def renombrar_archivo(ruta_archivo, nuevo_nombre):
-    
-    directorio, nombre_archivo = os.path.split(ruta_archivo)
+class Directorio:
+    def __init__(self, ruta):
+        self.ruta = ruta
 
-    nuevo_nombre_archivo = os.path.join(directorio, nuevo_nombre)
+    def listar_archivos(self):
+        try:
+            archivos = os.listdir(self.ruta)
+            return [Archivo(archivo, os.path.join(self.ruta, archivo)) for archivo in archivos]
+        except OSError as e:
+            print(f"No se pudo listar los archivos en el directorio {self.ruta}: {e}")
+            return []
 
-    try:
-        os.rename(ruta_archivo, nuevo_nombre_archivo)
-        print("Archivo renombrado exitosamente.")
-    except OSError:
-        print("Error al renombrar el archivo.")
+    def crear_archivo(self, nombre):
+        ruta = os.path.join(self.ruta, nombre)
+        try:
+            open(ruta, 'w').close()
+            return Archivo(nombre, ruta)
+        except OSError as e:
+            print(f"No se pudo crear el archivo {nombre} en el directorio {self.ruta}: {e}")
+            return None
 
-ruta_archivo = "d:/PROYECT/tes.txt"
-nuevo_nombre = "syxz"
+    def crear_directorio(self, nombre):
+        ruta = os.path.join(self.ruta, nombre)
+        try:
+            os.mkdir(ruta)
+            return Directorio(ruta)
+        except OSError as e:
+            print(f"No se pudo crear el directorio {nombre} en el directorio {self.ruta}: {e}")
+            return None
 
-renombrar_archivo(ruta_archivo, nuevo_nombre)
+    def buscar_archivos(self, consulta):
+        archivos = []
+        try:
+            for root, dirs, filenames in os.walk(self.ruta):
+                for filename in filenames:
+                    if consulta in filename:
+                        ruta_archivo = os.path.join(root, filename)
+                        archivos.append(Archivo(filename, ruta_archivo))
+        except OSError as e:
+            print(f"No se pudo buscar archivos en el directorio {self.ruta}: {e}")
+        return archivos
 
-"""-----------------------------------------------------------------------------------------"""
-
-def modificar_permisos(archivo, permisos):
-    try:
-
-        permisos_actuales = os.lstat(archivo).st_mode & 0o777
-
-        nuevos_permisos = permisos_actuales | permisos
-
-        os.chmod(archivo, nuevos_permisos)
-
-        print(f"Se han modificado los permisos del archivo {archivo}")
-    except FileNotFoundError:
-        print(f"El archivo {archivo} no existe.")
-    except:
-        print("Ha ocurrido un error al intentar modificar los permisos.")
-
-# Ejemplo de uso
-archivo = "d:/PROYECT/2.2.txt"
-permisos = 0o600  
-
-modificar_permisos(archivo, permisos)
+    def mover_archivo(self, archivo, destino):
+        try:
+            shutil.move(archivo.ruta, os.path.join(destino.ruta, archivo.nombre))
+            archivo.ruta = os.path.join(destino.ruta, archivo.nombre)
+        except (shutil.Error, OSError) as e:
+            print(f"No se pudo mover el archivo {archivo.nombre} al directorio {destino.ruta}: {e}")
