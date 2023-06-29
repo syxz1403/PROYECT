@@ -11,7 +11,7 @@ def generar_grafica(entidad):
             lector_csv = csv.DictReader(archivo_csv)
             
             for fila in lector_csv:
-                if fila["entidad"] == entidad:
+                if fila["nit_de_la_entidad"] == entidad:
                     datos_entidad.append(fila)
         
         fechas = []
