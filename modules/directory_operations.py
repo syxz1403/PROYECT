@@ -1,3 +1,4 @@
+
 import os
 import shutil
 from modules.file_operations import Archivo
@@ -43,10 +44,11 @@ class Directorio:
         except OSError as e:
             print(f"No se pudo buscar archivos en el directorio {self.ruta}: {e}")
         return archivos
-
+    
     def mover_archivo(self, archivo, destino):
         try:
             shutil.move(archivo.ruta, os.path.join(destino.ruta, archivo.nombre))
             archivo.ruta = os.path.join(destino.ruta, archivo.nombre)
         except (shutil.Error, OSError) as e:
             print(f"No se pudo mover el archivo {archivo.nombre} al directorio {destino.ruta}: {e}")
+
